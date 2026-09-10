@@ -1,0 +1,123 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Mall Index</title>
+
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="{% static 'mall/css/style.css' %}">
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark bg-dark shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                 Mall Management System
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container py-5">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="fw-bold mb-1">Latest Malls</h1>
+                <p class="text-muted mb-0">
+                    View all recently added malls
+                </p>
+            </div>
+
+            <span class="badge bg-primary fs-6">
+                {{ malls|length }} Malls
+            </span>
+        </div>
+
+        {% if malls %}
+
+            <div class="row g-4">
+
+                {% for mall in malls %}
+
+                    <div class="col-md-6 col-lg-4">
+
+                        <div class="card mall-card h-100">
+
+                            <div class="card-body">
+
+                                <h4 class="card-title fw-bold">
+                                    {{ mall.name }}
+                                </h4>
+
+                                <hr>
+
+                                <div class="row text-center">
+
+                                    <div class="col-6">
+                                        <div class="stat">
+                                            <h5>{{ mall.floors }}</h5>
+                                            <small class="text-muted">
+                                                Floors
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <div class="stat">
+                                            <h5>{{ mall.total_shops }}</h5>
+                                            <small class="text-muted">
+                                                Total Shops
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="card-footer bg-white border-0">
+                                <small class="text-muted">
+                                    Added {{ mall.created_at|date:"M d, Y" }}
+                                </small>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="alert alert-info text-center shadow-sm">
+                <h5>No malls available</h5>
+                <p class="mb-0">
+                    There are currently no malls in the system.
+                </p>
+            </div>
+
+        {% endif %}
+
+    </main>
+
+    <!-- Bootstrap JavaScript -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js">
+    </script>
+
+    <script src="{% static 'mall/js/script.js' %}"></script>
+
+</body>
+</html>
