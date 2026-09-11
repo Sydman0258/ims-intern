@@ -1,7 +1,7 @@
 from django.db import models
 
-from mall.models import Tenant,Product
-
+from tenant.models import Tenant
+from product.models import Product
 class Customer(models.Model):
 
     name = models.CharField(max_length=100)
