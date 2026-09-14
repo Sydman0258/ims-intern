@@ -1,24 +1,20 @@
-# accounts/views.py
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login
 from django.shortcuts import render, redirect
 
+from .forms import EmailAuthenticationForm
 from .models import Role
 
 
 def login_view(request):
     if request.method == "POST":
-        email = request.POST.get("email")
-        password = request.POST.get("password")
-        user = authenticate(request, username=email, password=password)
+        form = EmailAuthenticationForm(request=request, data=request.POST)
+        if form.is_valid():
+            login(request, form.get_user())
+            return redirect_by_role(form.get_user())
+        return render(request, "accounts/login.html", {"form": form})
 
-        if user is not None:
-            login(request, user)
-            return redirect_by_role(user)
-
-        return render(request, "accounts/login.html", {"error": "Invalid email or password"})
-
-    return render(request, "accounts/login.html")
+    form = EmailAuthenticationForm(request=request)
+    return render(request, "accounts/login.html", {"form": form})
 
 
 def redirect_by_role(user):
