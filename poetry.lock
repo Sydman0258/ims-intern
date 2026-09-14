@@ -70,6 +70,20 @@ files = [
 django = ">=5.2"
 
 [[package]]
+name = "dotenv"
+version = "0.9.9"
+description = "Deprecated package"
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "dotenv-0.9.9-py2.py3-none-any.whl", hash = "sha256:29cf74a087b31dafdb5a446b6d7e11cbce8ed2741540e2339c69fbef92c94ce9"},
+]
+
+[package.dependencies]
+python-dotenv = "*"
+
+[[package]]
 name = "psycopg2-binary"
 version = "2.9.13"
 description = "psycopg2 - Python-PostgreSQL Database Adapter"
@@ -193,4 +207,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<4.0"
-content-hash = "1adfcd8d7d5647f2c2e873027b38a0e37d9228f7c868ae4b5d5d77a7010feea1"
+content-hash = "6fc055980f01956b9b27730c92786ca8668441b7e434a84d74f5279f399ad8ee"
