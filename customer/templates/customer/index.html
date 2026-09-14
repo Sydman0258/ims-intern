@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Home</title>
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark shadow-sm">
+        <div class="container d-flex justify-content-between">
+            <a class="navbar-brand fw-bold" href="#">Mall Management System</a>
+            <form method="post" action="{% url 'accounts:logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-light btn-sm">Log out</button>
+            </form>
+        </div>
+    </nav>
+
+    <main class="container py-5">
+        <h1 class="fw-bold">Welcome, {{ request.user.fullname }}</h1>
+        <p class="text-muted">Customer-facing pages are not built out yet.</p>
+    </main>
+</body>
+</html>

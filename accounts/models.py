@@ -101,7 +101,6 @@ class tenant(User):
 
     def save(self, *args, **kwargs):
         self.role = Role.TENANT
-        self.is_tenant = True
         super().save(*args, **kwargs)
 
 

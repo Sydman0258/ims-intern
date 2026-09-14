@@ -1,7 +1,15 @@
 from django.db import models
+from django.conf import settings
 
 from mall.models import Mall
 class Tenant(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="tenant_profile",
+        null=True,
+        blank=True,
+    )
     name = models.CharField(max_length=100)
     email = models.CharField(max_length=255, null=True, blank=True)
     phone = models.CharField(max_length=20, null=True, blank=True)
@@ -10,7 +18,6 @@ class Tenant(models.Model):
 
     def __str__(self):
         return self.name
-
 
 class RetailUnit(models.Model):
     mall = models.ForeignKey(
