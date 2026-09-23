@@ -1,0 +1,55 @@
+{% extends "customer/base.html" %}
+
+{% block title %}Buy {{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm p-4">
+            <h2 class="fw-bold mb-1">{{ product.name }}</h2>
+            <p class="text-muted mb-3">Sold by <strong>{{ product.shop.name }}</strong></p>
+            {% if product.description %}
+                <p>{{ product.description }}</p>
+            {% endif %}
+            <p class="price fs-4">₹{{ product.price }} <span class="fs-6 text-muted fw-normal">/ unit</span></p>
+            <p class="mb-4"><span class="badge bg-primary">{{ product.stock_quantity }} available</span></p>
+
+            {% if product.stock_quantity > 0 %}
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <h5 class="fw-bold mb-3">Your details</h5>
+                <div class="mb-3">
+                    <label for="{{ form.customer_name.id_for_label }}" class="form-label fw-semibold">{{ form.customer_name.label }}</label>
+                    {{ form.customer_name }}
+                    {% for error in form.customer_name.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="mb-4">
+                    <label for="{{ form.customer_phone.id_for_label }}" class="form-label fw-semibold">{{ form.customer_phone.label }}</label>
+                    {{ form.customer_phone }}
+                    {% for error in form.customer_phone.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+
+                <h5 class="fw-bold mb-3">Order</h5>
+                <div class="mb-3">
+                    <label for="{{ form.quantity.id_for_label }}" class="form-label fw-semibold">Quantity</label>
+                    {{ form.quantity }}
+                    {% for error in form.quantity.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="mb-4">
+                    <label for="{{ form.payment_method.id_for_label }}" class="form-label fw-semibold">Payment Method</label>
+                    {{ form.payment_method }}
+                    {% for error in form.payment_method.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg w-100">
+                    <i class="bi bi-bag-check"></i> Confirm Purchase
+                </button>
+            </form>
+            {% else %}
+                <div class="alert alert-warning mb-0">This product is currently out of stock.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

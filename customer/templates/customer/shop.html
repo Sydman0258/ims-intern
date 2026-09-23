@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>In-store only</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <span class="navbar-brand fw-bold">Mall Management System</span>
+        <a class="btn btn-outline-light btn-sm" href="{% url 'accounts:login' %}">Staff login</a>
+    </div>
+</nav>
+<main class="container py-5 text-center">
+    <h1 class="fw-bold mb-3">Online purchasing is not available</h1>
+    <p class="lead text-muted">
+        Products are sold only in our retail stores. Please visit a store in the mall
+        to browse and buy.
+    </p>
+    <a href="{% url 'accounts:login' %}" class="btn btn-primary mt-3">Staff / tenant login</a>
+</main>
+</body>
+</html>

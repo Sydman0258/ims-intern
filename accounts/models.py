@@ -4,9 +4,8 @@ from django.db import models
 
 class Role(models.TextChoices):
     ADMIN = "admin", "Admin"
-    TENANT = "tenant", "tenant"
-    CUSTOMER = "customer", "Customer"
-    MALL="mall","Mall"
+    TENANT = "tenant", "Tenant"
+    MALL_MANAGER = "mall_manager", "Mall Manager"
 
 
 class UserManager(BaseUserManager):
@@ -49,7 +48,7 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)
     fullname = models.CharField(max_length=250)
     role = models.CharField(
-        max_length=20, choices=Role.choices, default=Role.CUSTOMER
+        max_length=20, choices=Role.choices, default=Role.TENANT
     )
 
     USERNAME_FIELD = "email"
@@ -72,14 +71,10 @@ class tenantManager(UserManager):
         return super().get_queryset().filter(role=Role.TENANT)
 
 
-class CustomerManager(UserManager):
+class MallManagerRoleManager(UserManager):
     def get_queryset(self):
-        return super().get_queryset().filter(role=Role.CUSTOMER)
+        return super().get_queryset().filter(role=Role.MALL_MANAGER)
 
-class MallManager(UserManager):
-    def get_queryset(self):
-        return super().get_queryset().filter(role=Role.MALL)
-    
 
 
 class Admin(User):
@@ -104,22 +99,12 @@ class tenant(User):
         super().save(*args, **kwargs)
 
 
-class Customer(User):
-    objects = CustomerManager()
+class MallManager(User):
+    objects = MallManagerRoleManager()
 
     class Meta:
         proxy = True
 
     def save(self, *args, **kwargs):
-        self.role = Role.CUSTOMER
+        self.role = Role.MALL_MANAGER
         super().save(*args, **kwargs)
-
-class Mall(User):
-    objects=MallManager()
-
-    class Meta:
-        proxy = True
-
-    def save(self,*args,**kwargs):
-        self.role=Role.MALL
-        super().save(*args,**kwargs)

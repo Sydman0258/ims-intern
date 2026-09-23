@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth import authenticate
 
 
+
 class EmailAuthenticationForm(forms.Form):
     email = forms.EmailField(
         widget=forms.EmailInput(attrs={"autofocus": True, "class": "form-control"})

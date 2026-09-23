@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment History | {{ tenant.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-dark bg-dark shadow-sm">
+    <div class="container d-flex justify-content-between">
+        <a class="navbar-brand fw-bold" href="{% url 'tenant:dashboard' %}">Mall Management System</a>
+        <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline-light btn-sm">Log out</button>
+        </form>
+    </div>
+</nav>
+
+<main class="container py-5">
+    <a href="{% url 'tenant:dashboard' %}" class="text-decoration-none">← Dashboard</a>
+    <h1 class="fw-bold mt-3 mb-1">Payment history</h1>
+    <p class="text-muted mb-4">{{ tenant.name }} · {{ purchase_count }} purchase(s) · Total received: <strong>{{ total_received }}</strong></p>
+
+    {% if purchases %}
+        <div class="table-responsive">
+            <table class="table table-bordered bg-white align-middle">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Customer</th>
+                        <th>Phone</th>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th>Paid</th>
+                        <th>Payments</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in purchases %}
+                        <tr>
+                            <td>{{ p.pk }}</td>
+                            <td>{{ p.customer.name }}</td>
+                            <td>{{ p.customer.phone }}</td>
+                            <td>{{ p.purchase_date|date:"M d, Y H:i" }}</td>
+                            <td>{{ p.total_amount }}</td>
+                            <td>{{ p.full_paid|yesno:"Yes,No" }}</td>
+                            <td>
+                                {% for pay in p.payments.all %}
+                                    <span class="badge bg-success">{{ pay.amount }} ({{ pay.payment_method|default:"—" }})</span>
+                                {% empty %}—
+                                {% endfor %}
+                            </td>
+                            <td><a href="{% url 'tenant:purchase_detail' p.pk %}">View</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if page_obj.has_other_pages %}
+            <nav>
+                <ul class="pagination">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+                    {% endif %}
+                    <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+                    {% if page_obj.has_next %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% endif %}
+    {% else %}
+        <p class="text-muted">No payment history yet.</p>
+    {% endif %}
+</main>
+</body>
+</html>

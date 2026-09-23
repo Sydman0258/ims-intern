@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assign retail store | {{ mall.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-dark bg-dark shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="{% url 'mall:mall_detail' mall.id %}">{{ mall.name }}</a>
+    </div>
+</nav>
+<main class="container py-5" style="max-width: 560px;">
+    <a href="{% url 'mall:mall_detail' mall.id %}" class="text-decoration-none">← Back to mall</a>
+    <h1 class="fw-bold mt-3 mb-1">Assign retail store</h1>
+    <p class="text-muted mb-4">Create a retail unit and assign it to a tenant of {{ mall.name }}. The tenant can then add products to this store.</p>
+
+    {% if not form.fields.tenant.queryset.exists %}
+        <div class="alert alert-warning">
+            No tenants are assigned to this mall yet.
+            <a href="{% url 'mall:create_tenant' mall.id %}">Create a tenant</a> first.
+        </div>
+    {% else %}
+        <form method="post" class="card card-body shadow-sm">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="mb-3">
+                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                    {% for error in field.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Assign retail store</button>
+        </form>
+    {% endif %}
+</main>
+</body>
+</html>

@@ -11,8 +11,8 @@ from .models import (
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ("name", "email", "phone", "created_at")
-    search_fields = ("name", "email", "phone")
+    list_display = ("name", "phone", "email", "created_at")
+    search_fields = ("name", "phone", "email")
 
 
 class CustomerPurchaseItemInline(admin.TabularInline):

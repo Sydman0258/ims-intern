@@ -1,26 +1,41 @@
 from django.db import models
 
-from tenant.models import Tenant
+from tenant.models import RetailUnit, Tenant
 from product.models import Product
-class Customer(models.Model):
 
+
+class Customer(models.Model):
     name = models.CharField(max_length=100)
+    phone = models.CharField(max_length=20)
     email = models.CharField(max_length=255, null=True, blank=True)
-    phone = models.CharField(max_length=20, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.name} ({self.phone})" if self.phone else self.name
+
 
 class CustomerPurchase(models.Model):
+    """In-store (offline) sale recorded by the tenant / retail store."""
+
     customer = models.ForeignKey(
         Customer, on_delete=models.CASCADE, related_name="purchases")
     tenant = models.ForeignKey(
-        Tenant, on_delete=models.CASCADE, related_name="purchases") # type: ignore
+        Tenant, on_delete=models.CASCADE, related_name="purchases")
+    retail_unit = models.ForeignKey(
+        RetailUnit,
+        on_delete=models.CASCADE,
+        related_name="purchases",
+        null=True,
+        blank=True,
+    )
     purchase_date = models.DateTimeField()
     total_amount = models.DecimalField(max_digits=12, decimal_places=2)
     full_paid = models.BooleanField(default=False)
+    is_offline = models.BooleanField(
+        default=True,
+        help_text="True for in-store sales recorded by tenant (no online buying).",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -45,13 +60,10 @@ class CustomerPayment(models.Model):
     purchase = models.ForeignKey(
         CustomerPurchase, on_delete=models.CASCADE, related_name="payments")
     amount = models.DecimalField(max_digits=12, decimal_places=2)
-    payment_method = models.CharField(
-        max_length=50, null=True, blank=True)
-    payment_status = models.CharField(
-        max_length=50, null=True, blank=True)
+    payment_method = models.CharField(max_length=50, null=True, blank=True)
+    payment_status = models.CharField(max_length=50, null=True, blank=True)
     payment_date = models.DateTimeField()
-    transaction_reference = models.CharField(
-        max_length=255, null=True, blank=True)
+    transaction_reference = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return f"Payment #{self.pk}"

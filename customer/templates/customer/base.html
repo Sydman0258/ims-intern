@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Mall Shop{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body { background: #f5f7fb; font-family: Inter, system-ui, sans-serif; }
+        .navbar { background: #111827; }
+        .navbar-brand { font-weight: 700; }
+        .card { border-radius: 16px; border: 1px solid #e5e7eb; }
+        .price { font-weight: 700; color: #059669; }
+        .product-card {
+            background: white; border: 1px solid #e5e7eb; border-radius: 16px;
+            padding: 24px; height: 100%; transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .product-card:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(15,23,42,0.08); }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark mb-4">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'customer:index' %}"><i class="bi bi-shop"></i> Mall Shop</a>
+        <div class="d-flex align-items-center gap-2">
+            <a href="{% url 'customer:index' %}" class="btn btn-outline-light btn-sm">Shop</a>
+            <a href="{% url 'accounts:login' %}" class="btn btn-sm btn-light">Staff login</a>
+        </div>
+    </div>
+</nav>
+
+<main class="container pb-5">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

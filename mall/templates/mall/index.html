@@ -1,123 +1,68 @@
 {% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Mall Index</title>
-
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
-
+    <title>Mall Management | All Malls</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'mall/css/style.css' %}">
 </head>
-
 <body>
-
-    <!-- Navbar -->
-    <nav class="navbar navbar-dark bg-dark shadow-sm">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="#">
-                 Mall Management System
-            </a>
+<nav class="navbar navbar-dark bg-dark shadow-sm">
+    <div class="container d-flex justify-content-between">
+        <a class="navbar-brand fw-bold" href="{% url 'mall:index' %}">Mall Management System</a>
+        <div class="d-flex align-items-center gap-3">
+            <span class="text-white-50 small">Mall Manager</span>
+            <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-light btn-sm">Log out</button>
+            </form>
         </div>
-    </nav>
+    </div>
+</nav>
 
-    <!-- Main Content -->
-    <main class="container py-5">
+<main class="container py-5">
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+    {% endfor %}
 
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <div>
-                <h1 class="fw-bold mb-1">Latest Malls</h1>
-                <p class="text-muted mb-0">
-                    View all recently added malls
-                </p>
-            </div>
+    <div class="mb-4">
+        <h1 class="fw-bold mb-1">All Malls</h1>
+        <p class="text-muted mb-0">Select a mall to manage tenants, retail units, and leases.</p>
+    </div>
 
-            <span class="badge bg-primary fs-6">
-                {{ malls|length }} Malls
-            </span>
-        </div>
-
-        {% if malls %}
-
-            <div class="row g-4">
-
-                {% for mall in malls %}
-
-                    <div class="col-md-6 col-lg-4">
-
-                        <div class="card mall-card h-100">
-
-                            <div class="card-body">
-
-                                <h4 class="card-title fw-bold">
-                                    {{ mall.name }}
-                                </h4>
-
-                                <hr>
-
-                                <div class="row text-center">
-
-                                    <div class="col-6">
-                                        <div class="stat">
-                                            <h5>{{ mall.floors }}</h5>
-                                            <small class="text-muted">
-                                                Floors
-                                            </small>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-6">
-                                        <div class="stat">
-                                            <h5>{{ mall.total_shops }}</h5>
-                                            <small class="text-muted">
-                                                Total Shops
-                                            </small>
-                                        </div>
-                                    </div>
-
-                                </div>
-
+    {% if malls %}
+        <div class="row g-4">
+            {% for mall in malls %}
+            <div class="col-md-6 col-lg-4">
+                <a href="{% url 'mall:mall_detail' mall.id %}" class="text-decoration-none text-dark">
+                    <div class="card mall-card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title fw-bold">{{ mall.name }}</h5>
+                            <p class="text-muted small mb-2">
+                                {% if mall.email %}{{ mall.email }}{% endif %}
+                                {% if mall.phone %} · {{ mall.phone }}{% endif %}
+                            </p>
+                            <div class="d-flex flex-wrap gap-3 small">
+                                <span><strong>{{ mall.floors }}</strong> floors</span>
+                                <span><strong>{{ mall.total_shops }}</strong> shops</span>
+                                <span><strong>{{ mall.tenant_count }}</strong> tenants</span>
+                                <span><strong>{{ mall.unit_count }}</strong> units</span>
                             </div>
-
-                            <div class="card-footer bg-white border-0">
-                                <small class="text-muted">
-                                    Added {{ mall.created_at|date:"M d, Y" }}
-                                </small>
-                            </div>
-
                         </div>
-
+                        <div class="card-footer bg-transparent border-0 pb-3">
+                            <span class="btn btn-primary btn-sm">Open mall →</span>
+                        </div>
                     </div>
-
-                {% endfor %}
-
+                </a>
             </div>
-
-        {% else %}
-
-            <div class="alert alert-info text-center shadow-sm">
-                <h5>No malls available</h5>
-                <p class="mb-0">
-                    There are currently no malls in the system.
-                </p>
-            </div>
-
-        {% endif %}
-
-    </main>
-
-    <!-- Bootstrap JavaScript -->
-    <script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js">
-    </script>
-
-    <script src="{% static 'mall/js/script.js' %}"></script>
-
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-muted">No malls registered yet. Create malls from the admin panel.</p>
+    {% endif %}
+</main>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

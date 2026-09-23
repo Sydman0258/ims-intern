@@ -1,10 +1,18 @@
 from django.db import models
 
-from tenant.models import Tenant
+from tenant.models import RetailUnit
+
 
 class Product(models.Model):
-    shop = models.ForeignKey(
-        Tenant, on_delete=models.CASCADE, related_name="products")
+    """Products belong to a retail store (unit), not the tenant company."""
+
+    retail_unit = models.ForeignKey(
+        RetailUnit,
+        on_delete=models.CASCADE,
+        related_name="products",
+        null=True,
+        blank=True,
+    )
     name = models.CharField(max_length=150)
     description = models.TextField(null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -15,3 +23,12 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def tenant(self):
+        return self.retail_unit.tenant
+
+    @property
+    def shop(self):
+        """Backward-compatible alias used in older code."""
+        return self.retail_unit.tenant
