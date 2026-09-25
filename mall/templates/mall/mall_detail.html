@@ -5,31 +5,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mall Manager | {{ mall.name }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'mall/css/style.css' %}">
 </head>
 <body>
 <nav class="navbar navbar-dark bg-dark shadow-sm">
     <div class="container d-flex justify-content-between">
-        <a class="navbar-brand fw-bold" href="{% url 'mall:index' %}">Mall Management System</a>
+        <a class="navbar-brand fw-bold" href="{% url 'mall:index' %}">
+            Mall Management System
+        </a>
         <div class="d-flex align-items-center gap-3">
-            <a href="{% url 'mall:index' %}" class="btn btn-outline-light btn-sm">All malls</a>
+            <a href="{% url 'mall:index' %}" class="btn btn-outline-light btn-sm">
+                All malls
+            </a>
             <span class="text-white-50 small">Mall Manager</span>
             <form method="post" action="{% url 'accounts:logout' %}" class="m-0">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-outline-light btn-sm">Log out</button>
+                <button type="submit" class="btn btn-outline-light btn-sm">
+                    Log out
+                </button>
             </form>
         </div>
     </div>
 </nav>
 
 <main class="container py-5">
+
     {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
     {% endfor %}
 
+    <!-- Mall information -->
     <div class="mb-4">
-        <p class="mb-1"><a href="{% url 'mall:index' %}" class="text-decoration-none">← All malls</a></p>
+        <p class="mb-1">
+            <a href="{% url 'mall:index' %}" class="text-decoration-none">
+                ← All malls
+            </a>
+        </p>
         <h1 class="fw-bold mb-1">{{ mall.name }}</h1>
         <p class="text-muted mb-0">
             {% if mall.phone %}{{ mall.phone }}{% endif %}
@@ -37,58 +51,60 @@
         </p>
     </div>
 
+    <!-- Statistics -->
     <div class="row g-4 mb-5 text-center">
         <div class="col-6 col-lg-3">
-            <div class="card mall-card h-100"><div class="card-body">
-                <h5>{{ floors }}</h5><small class="text-muted">Floors</small>
-            </div></div>
+            <div class="card mall-card h-100">
+                <div class="card-body">
+                    <h5>{{ floors }}</h5>
+                    <small class="text-muted">Floors</small>
+                </div>
+            </div>
         </div>
         <div class="col-6 col-lg-3">
-            <div class="card mall-card h-100"><div class="card-body">
-                <h5>{{ tenants|length }}</h5><small class="text-muted">Tenants</small>
-            </div></div>
+            <div class="card mall-card h-100">
+                <div class="card-body">
+                    <h5>{{ tenants|length }}</h5>
+                    <small class="text-muted">Tenants</small>
+                </div>
+            </div>
         </div>
         <div class="col-6 col-lg-3">
-            <div class="card mall-card h-100"><div class="card-body">
-                <h5>{{ retail_units|length }} </h5>
-                <small class="text-muted">Leased Retail units</small>
-            </div></div>
+            <div class="card mall-card h-100">
+                <div class="card-body">
+                    <h5>{{ retail_units|length }}</h5>
+                    <small class="text-muted">Retail units</small>
+                </div>
+            </div>
         </div>
         <div class="col-6 col-lg-3">
-            <div class="card mall-card h-100"><div class="card-body">
-                <h5>{{ expired_count }}</h5><small class="text-muted">Expired leases</small>
-            </div></div>
+            <div class="card mall-card h-100">
+                <div class="card-body">
+                    <h5>{{ expired_count }}</h5>
+                    <small class="text-muted">Expired leases</small>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="row g-4 mb-5 text-center">
-        <div class="col-6">
-            {% comment %} <div class="card mall-card h-100"><div class="card-body">
-                <h5>{{ payment_total }}</h5><small class="text-muted">In-store sales ({{ purchase_count }} orders)</small>
-            </div></div> {% endcomment %}
-        </div>
-        <div class="col-6">
-            {% comment %} <div class="card mall-card h-100"><div class="card-body">
-                <h5>{{ lease_total }}</h5><small class="text-muted">Lease rent collected</small>
-            </div></div> {% endcomment %}
-        </div>
-    </div>
-
+    <!-- Tenants -->
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
         <h2 class="fw-bold mb-0">Tenants</h2>
         <div class="d-flex flex-wrap gap-2">
-            <a href="{% url 'mall:create_tenant' mall.id %}" class="btn btn-success btn-sm">+ Create tenant</a>
+            <a href="{% url 'mall:create_tenant' mall.id %}" class="btn btn-success btn-sm">
+                + Create tenant
+            </a>
             {% if available_tenants %}
-            <form method="post" action="{% url 'mall:assign_tenant' mall.id %}" class="d-flex gap-2">
-                {% csrf_token %}
-                <select name="tenant" class="form-select form-select-sm" required>
-                    <option value="">Assign existing…</option>
-                    {% for t in available_tenants %}
-                        <option value="{{ t.id }}">{{ t.name }}</option>
-                    {% endfor %}
-                </select>
-                <button type="submit" class="btn btn-primary btn-sm text-nowrap">Assign</button>
-            </form>
+                <form method="post" action="{% url 'mall:assign_tenant' mall.id %}" class="d-flex gap-2">
+                    {% csrf_token %}
+                    <select name="tenant" class="form-select form-select-sm" required>
+                        <option value="">Assign existing…</option>
+                        {% for t in available_tenants %}
+                            <option value="{{ t.id }}">{{ t.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary btn-sm text-nowrap">Assign</button>
+                </form>
             {% endif %}
         </div>
     </div>
@@ -108,16 +124,25 @@
                 <tbody>
                     {% for t in tenants %}
                         <tr>
-                            <td><a href="{% url 'mall:tenant_detail' mall.id t.id %}">{{ t.name }}</a></td>
+                            <td>
+                                <a href="{% url 'mall:tenant_detail' mall.id t.id %}">
+                                    {{ t.name }}
+                                </a>
+                            </td>
                             <td>{{ t.email|default:"-" }}</td>
                             <td>{{ t.phone|default:"-" }}</td>
                             <td>{{ t.unit_count }}</td>
                             <td class="text-end">
-                                <a href="{% url 'mall:tenant_detail' mall.id t.id %}" class="btn btn-outline-primary btn-sm">View</a>
+                                <a href="{% url 'mall:tenant_detail' mall.id t.id %}"
+                                   class="btn btn-outline-primary btn-sm">View</a>
                                 {% if t.unit_count == 0 %}
-                                    <form method="post" action="{% url 'mall:remove_tenant' mall.id t.id %}" class="d-inline">
+                                    <form method="post"
+                                          action="{% url 'mall:remove_tenant' mall.id t.id %}"
+                                          class="d-inline">
                                         {% csrf_token %}
-                                        <button type="submit" class="btn btn-outline-danger btn-sm">Remove</button>
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            Remove
+                                        </button>
                                     </form>
                                 {% endif %}
                             </td>
@@ -127,13 +152,19 @@
             </table>
         </div>
     {% else %}
-        <p class="text-muted">No tenants assigned yet. Create a tenant or assign an existing one.</p>
+        <p class="text-muted">
+            No tenants assigned yet. Create a tenant or assign an existing one.
+        </p>
     {% endif %}
 
+    <!-- Retail units -->
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mt-5 mb-3">
         <h2 class="fw-bold mb-0">Retail stores (units)</h2>
-        <a href="{% url 'mall:assign_retail_unit' mall.id %}" class="btn btn-primary btn-sm">+ Assign retail store to tenant</a>
+        <a href="{% url 'mall:assign_retail_unit' mall.id %}" class="btn btn-primary btn-sm">
+            + Assign retail store to tenant
+        </a>
     </div>
+
     {% if retail_units %}
         <div class="table-responsive">
             <table class="table table-bordered bg-white align-middle">
@@ -152,8 +183,20 @@
                     {% for unit in retail_units %}
                         <tr class="{% if unit.is_lease_expired %}table-warning{% endif %}">
                             <td>{{ unit.title }}</td>
-                            <td>{{ unit.tenant.name }}</td>
-                            <td>{% if unit.monthly_rent %}₹{{ unit.monthly_rent }}/mo{% else %}—{% endif %}</td>
+                            <td>
+                                {% if unit.tenant %}
+                                    {{ unit.tenant.name }}
+                                {% else %}
+                                    <span class="text-muted">Unassigned</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if unit.monthly_rent %}
+                                    ₹{{ unit.monthly_rent }}/mo
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
                             <td>{{ unit.leased|yesno:"Yes,No" }}</td>
                             <td>{{ unit.renewal_date|default:"—" }}</td>
                             <td>
@@ -164,28 +207,92 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% if unit.is_lease_expired or unit.leased %}
-                                <div class="d-flex flex-wrap gap-1 align-items-center">
-                                    <form method="post" action="{% url 'mall:lease_action' mall.id unit.id %}" class="d-inline-flex flex-wrap gap-1 align-items-center">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="action" value="renew">
-                                        <input type="number" name="months" value="12" min="1" class="form-control form-control-sm" style="width:4.5rem" title="Months">
-                                        <input type="number" name="monthly_rent" value="{{ unit.monthly_rent|default:'' }}" step="0.01" min="0" class="form-control form-control-sm" style="width:6.5rem" placeholder="₹/mo" title="Lease amount">
-                                        <button type="submit" class="btn btn-success btn-sm">Renew</button>
-                                    </form>
-                                    <form method="post" action="{% url 'mall:lease_action' mall.id unit.id %}" class="d-inline">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="action" value="mark_pending">
-                                        <button type="submit" class="btn btn-outline-warning btn-sm">Mark pending</button>
-                                    </form>
-                                    <form method="post" action="{% url 'mall:lease_action' mall.id unit.id %}" class="d-inline">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="action" value="end">
-                                        <button type="submit" class="btn btn-outline-danger btn-sm">End lease</button>
-                                    </form>
-                                </div>
-                                {% else %}
-                                    <span class="text-muted">—</span>
+                                {% if unit.leased %}
+                                    <div class="d-flex flex-wrap gap-1 align-items-center">
+                                        <!-- Renew -->
+                                        <form method="post"
+                                              action="{% url 'mall:lease_action' mall.id unit.id %}"
+                                              class="d-inline-flex flex-wrap gap-1 align-items-center">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="renew">
+                                            <input type="number" name="months" value="12" min="1"
+                                                   class="form-control form-control-sm"
+                                                   style="width:4.5rem" title="Months">
+                                            <input type="number" name="monthly_rent"
+                                                   value="{{ unit.monthly_rent|default:'' }}"
+                                                   step="0.01" min="0"
+                                                   class="form-control form-control-sm"
+                                                   style="width:6.5rem" placeholder="₹/mo"
+                                                   title="Lease amount">
+                                            <button type="submit" class="btn btn-success btn-sm">Renew</button>
+                                        </form>
+
+                                        <!-- Mark pending -->
+                                        <form method="post"
+                                              action="{% url 'mall:lease_action' mall.id unit.id %}"
+                                              class="d-inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="mark_pending">
+                                            <button type="submit" class="btn btn-outline-warning btn-sm">
+                                                Mark pending
+                                            </button>
+                                        </form>
+
+                                        <!-- End lease -->
+                                        <form method="post"
+                                              action="{% url 'mall:lease_action' mall.id unit.id %}"
+                                              class="d-inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="end">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                End lease
+                                            </button>
+                                        </form>
+                                    </div>
+                                                                {% else %}
+                                    <!-- Unleased unit → re-assign to a tenant of this mall -->
+                                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                                        {% if mall_tenants %}
+                                            <form method="post"
+                                                  action="{% url 'mall:reassign_unit' mall.id unit.id %}"
+                                                  class="d-flex flex-wrap gap-2 align-items-center">
+                                                {% csrf_token %}
+
+                                                <select name="tenant"
+                                                        class="form-select form-select-sm"
+                                                        required>
+                                                    <option value="">Assign tenant…</option>
+                                                    {% for t in mall_tenants %}
+                                                        <option value="{{ t.id }}">{{ t.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+
+                                                <input type="number"
+                                                       name="monthly_rent"
+                                                       value="{{ unit.monthly_rent|default:'' }}"
+                                                       step="0.01"
+                                                       min="0"
+                                                       class="form-control form-control-sm"
+                                                       style="width:6.5rem"
+                                                       placeholder="₹/mo"
+                                                       title="Monthly rent">
+
+                                                <input type="number"
+                                                       name="months"
+                                                       value="12"
+                                                       min="1"
+                                                       class="form-control form-control-sm"
+                                                       style="width:4.5rem"
+                                                       title="Months">
+
+                                                <button type="submit" class="btn btn-primary btn-sm">
+                                                    Assign
+                                                </button>
+                                            </form>
+                                        {% else %}
+                                            <span class="text-muted">No tenants in this mall yet</span>
+                                        {% endif %}
+                                    </div>
                                 {% endif %}
                             </td>
                         </tr>
@@ -194,9 +301,13 @@
             </table>
         </div>
     {% else %}
-        <p class="text-muted">No retail units yet. Assign a retail store to a tenant using the button above.</p>
+        <p class="text-muted">
+            No retail units yet. Assign a retail store to a tenant using the button above.
+        </p>
     {% endif %}
+
 </main>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

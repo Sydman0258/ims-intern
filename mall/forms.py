@@ -149,3 +149,18 @@ class AssignRetailUnitForm(forms.ModelForm):
             unit.save()
             # RetailUnit.save also adds mall to tenant.malls
         return unit
+
+class AssignTenantForm(forms.Form):
+    tenant = forms.ModelChoiceField(
+        queryset=Tenant.objects.none(),
+        widget=forms.Select(attrs={"class": "form-select"}),
+        empty_label="Select a tenant",
+    )
+
+    def __init__(self, *args, mall, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields["tenant"].queryset = (
+            Tenant.objects.filter(malls=mall)
+            .order_by("name")
+        )

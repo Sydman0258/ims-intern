@@ -28,7 +28,7 @@ class RetailUnit(models.Model):
     mall = models.ForeignKey(
         Mall, on_delete=models.CASCADE, related_name="retail_unit")
     tenant = models.ForeignKey(
-        Tenant, on_delete=models.CASCADE, related_name="retail_unit")
+        Tenant, on_delete=models.SET_NULL, related_name="retail_unit",blank=True,null=True)
     title = models.CharField(max_length=100)
     leased = models.BooleanField(default=False)
     leased_date = models.DateField(null=True, blank=True)
@@ -45,8 +45,10 @@ class RetailUnit(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        self.tenant.malls.add(self.mall)
+     super().save(*args, **kwargs)
+
+     if self.tenant:
+        self.tenant.malls.add(self.mall)    
 
     @property
     def is_lease_expired(self):
