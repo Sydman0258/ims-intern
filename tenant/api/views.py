@@ -5,6 +5,14 @@ from customer.models import CustomerPurchase
 from product.models import Product
 from tenant.models import RetailUnit
 
+from .serializers import (
+    MallBriefSerializer,
+    ProductSerializer,
+    RecentPurchaseSerializer,
+    RetailUnitSerializer,
+    TenantBriefSerializer,
+)
+
 
 @api_view(["GET"])
 def dashboard(request):
@@ -30,50 +38,13 @@ def dashboard(request):
         .order_by("-purchase_date")[:8]
     )
 
-    purchase_count = (
-        CustomerPurchase.objects
-        .filter(tenant=tenant)
-        .count()
-    )
+    purchase_count = CustomerPurchase.objects.filter(tenant=tenant).count()
 
     return Response({
-        "tenant": {
-            "id": tenant.id,
-            "name": tenant.name,
-        },
-        "malls": [
-            {
-                "id": mall.id,
-                "name": mall.name,
-            }
-            for mall in tenant.malls.order_by("name")
-        ],
-        "retail_units": [
-            {
-                "id": retail_unit.id,
-                "title": retail_unit.title,
-                "mall": retail_unit.mall.name,
-            }
-            for retail_unit in retail_units
-        ],
-        "products": [
-            {
-                "id": product.id,
-                "name": product.name,
-                "stock": product.stock_quantity,
-                "retail_unit": product.retail_unit.title,
-            }
-            for product in products
-        ],
-        "recent_purchases": [
-            {
-                "id": purchase.id,
-                "customer": purchase.customer.name,
-                "retail_unit": purchase.retail_unit.title if purchase.retail_unit else None,
-                "total": purchase.total_amount,
-                "date": purchase.purchase_date,
-            }
-            for purchase in recent_purchases
-        ],
+        "tenant": TenantBriefSerializer(tenant).data,
+        "malls": MallBriefSerializer(tenant.malls.order_by("name"), many=True).data,
+        "retail_units": RetailUnitSerializer(retail_units, many=True).data,
+        "products": ProductSerializer(products, many=True).data,
+        "recent_purchases": RecentPurchaseSerializer(recent_purchases, many=True).data,
         "purchase_count": purchase_count,
     })
