@@ -83,6 +83,18 @@ class ProductForm(forms.ModelForm):
             self.fields["retail_unit"].label = "Retail store"
         self.fields["retail_unit"].required = True
 
+    def clean_price(self):
+        price = self.cleaned_data["price"]
+        if price < 0:
+            raise forms.ValidationError("Price cannot be negative.")
+        return price
+
+    def clean_stock_quantity(self):
+        stock = self.cleaned_data["stock_quantity"]
+        if stock < 0:
+            raise forms.ValidationError("Stock cannot be negative.")
+        return stock
+
 
 class OfflineSaleForm(forms.Form):
     """Record an in-store sale: customer + product(s) from one retail unit."""

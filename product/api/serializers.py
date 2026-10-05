@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from product.models import Product
+from tenant.models import RetailUnit
 
 
 class ProductListSerializer(serializers.ModelSerializer):
@@ -34,4 +35,13 @@ class ProductListSerializer(serializers.ModelSerializer):
 
 
 class ProductDetailSerializer(ProductListSerializer):
-    pass
+    stock = serializers.IntegerField(source="stock_quantity")
+
+    retail_unit_id = serializers.PrimaryKeyRelatedField(
+        source="retail_unit",
+        queryset=RetailUnit.objects.all(),
+        write_only=True,
+    )
+
+    class Meta(ProductListSerializer.Meta):
+        fields = ProductListSerializer.Meta.fields + ["retail_unit_id"]

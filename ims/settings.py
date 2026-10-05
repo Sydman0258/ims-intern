@@ -41,8 +41,11 @@ INSTALLED_APPS = [
     "customer",
     "accounts",
     "rest_framework",
+    "rest_framework.authtoken",
     "product",
     "tenant",
+    'drf_spectacular',
+
 ]
 
 MIDDLEWARE = [
@@ -74,16 +77,24 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "ims.wsgi.application"
 
-# ---------------------------------------------------------------------------
-# Django REST Framework — simple session auth only (no JWT, no cookies)
-# ---------------------------------------------------------------------------
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Your Project API',
+    'DESCRIPTION': 'Your project description',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
 }
 
 # Database
@@ -142,3 +153,46 @@ MESSAGE_TAGS = {message_constants.ERROR: "danger"}
 AUTH_USER_MODEL = "accounts.User"
 LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "accounts:login"
+
+
+# ---------------------------------------------------------------------------
+# Production / Docker friendly overrides
+# ---------------------------------------------------------------------------
+SECRET_KEY = os.environ.get("SECRET_KEY", SECRET_KEY)
+DEBUG = os.environ.get("DEBUG", "True").lower() in ("true", "1", "yes")
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "*").split(",")
+
+# Static files (WhiteNoise + Nginx)
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+# Media (optional)
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+# Make sure WhiteNoise is early in middleware
+if "whitenoise.middleware.WhiteNoiseMiddleware" not in MIDDLEWARE:
+    MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+
+# ---------------------------------------------------------------------------
+# Celery
+# ---------------------------------------------------------------------------
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "redis://localhost:6379/1")
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60  # 30 minutes
+
+# django-celery-beat & results
+INSTALLED_APPS += [
+    "django_celery_beat",
+    "django_celery_results",
+]
+
+# Optional: use console email backend when no SMTP is configured
+if not os.environ.get("EMAIL_HOST"):
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

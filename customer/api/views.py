@@ -1,6 +1,6 @@
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+from rest_framework import generics, viewsets
 
+from accounts.api.permissions import IsMallStaff
 from customer.models import Customer, CustomerPurchase
 
 from .serializers import (
@@ -10,37 +10,29 @@ from .serializers import (
 )
 
 
-@api_view(["GET"])
-def customer_list(request):
-    customers = Customer.objects.order_by("name")
-    return Response({"customers": CustomerSerializer(customers, many=True).data})
+class CustomerList(generics.ListAPIView):
+    permission_classes = [IsMallStaff]
+    serializer_class = CustomerSerializer
+    queryset = Customer.objects.order_by("name")
 
 
-@api_view(["GET"])
-def purchase_list(request):
-    purchases = (
+class PurchaseViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = [IsMallStaff]
+    queryset = (
         CustomerPurchase.objects
         .select_related("customer", "tenant", "retail_unit")
+        .prefetch_related("items__product")
         .order_by("-purchase_date")
     )
 
-    tenant_id = request.query_params.get("tenant")
-    if tenant_id:
-        purchases = purchases.filter(tenant_id=tenant_id)
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return PurchaseDetailSerializer
+        return PurchaseListSerializer
 
-    return Response({"purchases": PurchaseListSerializer(purchases, many=True).data})
-
-
-@api_view(["GET"])
-def purchase_detail(request, pk):
-    try:
-        purchase = (
-            CustomerPurchase.objects
-            .select_related("customer", "tenant", "retail_unit")
-            .prefetch_related("items__product")
-            .get(pk=pk)
-        )
-    except CustomerPurchase.DoesNotExist:
-        return Response({"error": "Purchase not found"}, status=404)
-
-    return Response(PurchaseDetailSerializer(purchase).data)
+    def get_queryset(self):
+        qs = super().get_queryset()
+        tenant_id = self.request.query_params.get("tenant")
+        if tenant_id:
+            qs = qs.filter(tenant_id=tenant_id)
+        return qs

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm delete – {{ object.name }}</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 480px; margin: 3rem auto; padding: 0 1rem; }
+        .card { border: 1px solid #ddd; border-radius: 8px; padding: 1.5rem; }
+        .actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; }
+        button, a.btn { padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; border: none; cursor: pointer; }
+        button.danger { background: #dc2626; color: #fff; }
+        a.btn { background: #e5e7eb; color: #111; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Delete product?</h1>
+        <p>Are you sure you want to delete <strong>{{ object.name }}</strong>?
+           {% if object.retail_unit %} ({{ object.retail_unit.title }}){% endif %}
+        </p>
+        <p><em>If this product appears in past sales, deletion will be blocked to preserve history.</em></p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="actions">
+                <button type="submit" class="danger">Yes, delete</button>
+                <a class="btn" href="{% url 'tenant:dashboard' %}">Cancel</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

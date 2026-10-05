@@ -3,6 +3,7 @@
     "python-envs.defaultPackageManager": "ms-python.python:conda",
     "cSpell.words": [
         "dotenv",
-        "endfor"
+        "endfor",
+        "viewsets"
     ]
 }

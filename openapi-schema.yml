@@ -1,0 +1,1017 @@
+openapi: 3.0.3
+info:
+  title: Your Project API
+  version: 1.0.0
+  description: Your project description
+paths:
+  /api/accounts/admins/:
+    get:
+      operationId: accounts_admins_list
+      tags:
+      - accounts
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Admin'
+          description: ''
+  /api/accounts/login/:
+    post:
+      operationId: accounts_login_create
+      description: |-
+        POST {"email": "...", "password": "..."}  ->  {"token": "...", "user": {...}}
+
+        Send the token on later requests as:  Authorization: Token <token>
+      tags:
+      - accounts
+      security:
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/accounts/logout/:
+    post:
+      operationId: accounts_logout_create
+      description: Invalidate the caller's token (and any session).
+      tags:
+      - accounts
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/accounts/mall-managers/:
+    get:
+      operationId: accounts_mall_managers_list
+      tags:
+      - accounts
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MallManager'
+          description: ''
+  /api/accounts/me/:
+    get:
+      operationId: accounts_me_retrieve
+      description: The currently authenticated user.
+      tags:
+      - accounts
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/accounts/tenants/:
+    get:
+      operationId: accounts_tenants_list
+      tags:
+      - accounts
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tenant'
+          description: ''
+  /api/accounts/users/:
+    get:
+      operationId: accounts_users_list
+      tags:
+      - accounts
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+          description: ''
+  /api/accounts/users/{user_id}/:
+    get:
+      operationId: accounts_users_retrieve
+      parameters:
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - accounts
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/accounts/users/create/:
+    post:
+      operationId: accounts_users_create_create
+      tags:
+      - accounts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCreate'
+          description: ''
+  /api/customer/:
+    get:
+      operationId: customer_list
+      tags:
+      - customer
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+          description: ''
+  /api/customer/purchases/:
+    get:
+      operationId: customer_purchases_list
+      tags:
+      - customer
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurchaseList'
+          description: ''
+  /api/customer/purchases/{id}/:
+    get:
+      operationId: customer_purchases_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - customer
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseDetail'
+          description: ''
+  /api/mall/:
+    get:
+      operationId: mall_list
+      tags:
+      - mall
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MallList'
+          description: ''
+  /api/mall/{mall_id}/:
+    get:
+      operationId: mall_retrieve
+      parameters:
+      - in: path
+        name: mall_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - mall
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/product/:
+    get:
+      operationId: product_list
+      tags:
+      - product
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductList'
+          description: ''
+  /api/product/{id}/:
+    get:
+      operationId: product_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - product
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDetail'
+          description: ''
+  /api/tenant/add-retail-unit/:
+    get:
+      operationId: tenant_add_retail_unit_retrieve
+      tags:
+      - tenant
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/tenant/dashboard/:
+    get:
+      operationId: tenant_dashboard_retrieve
+      tags:
+      - tenant
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/tenant/payments/:
+    get:
+      operationId: tenant_payments_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - tenant
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRecentPurchaseList'
+          description: ''
+  /api/tenant/products/:
+    post:
+      operationId: tenant_products_create
+      tags:
+      - tenant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Product'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+  /api/tenant/products-by-retail-unit/:
+    get:
+      operationId: tenant_products_by_retail_unit_list
+      tags:
+      - tenant
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+          description: ''
+  /api/tenant/products/{id}/:
+    get:
+      operationId: tenant_products_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - tenant
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+    put:
+      operationId: tenant_products_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - tenant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ProductWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ProductWrite'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductWrite'
+          description: ''
+    patch:
+      operationId: tenant_products_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - tenant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProductWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProductWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProductWrite'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductWrite'
+          description: ''
+    delete:
+      operationId: tenant_products_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - tenant
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/tenant/purchases/{id}/:
+    get:
+      operationId: tenant_purchases_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - tenant
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecentPurchase'
+          description: ''
+  /api/tenant/record-sale/:
+    post:
+      operationId: tenant_record_sale_create
+      tags:
+      - tenant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecentPurchase'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RecentPurchase'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RecentPurchase'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecentPurchase'
+          description: ''
+components:
+  schemas:
+    Admin:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        fullname:
+          type: string
+          maxLength: 250
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          readOnly: true
+      required:
+      - email
+      - fullname
+      - id
+      - role
+    Customer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        phone:
+          type: string
+          maxLength: 20
+        email:
+          type: string
+          nullable: true
+          maxLength: 255
+      required:
+      - id
+      - name
+      - phone
+    MallList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        floors:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        total_shops:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        num_leased:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        tenant_count:
+          type: integer
+          readOnly: true
+        unit_count:
+          type: integer
+          readOnly: true
+      required:
+      - floors
+      - id
+      - name
+      - tenant_count
+      - total_shops
+      - unit_count
+    MallManager:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        fullname:
+          type: string
+          maxLength: 250
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          readOnly: true
+      required:
+      - email
+      - fullname
+      - id
+      - role
+    PaginatedRecentPurchaseList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecentPurchase'
+    PatchedProductWrite:
+      type: object
+      description: Used by PUT/PATCH /api/tenant/products/<id>/ .
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        retail_unit:
+          type: integer
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+          nullable: true
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        stock_quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        status:
+          type: string
+          nullable: true
+          maxLength: 50
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        stock:
+          type: integer
+          readOnly: true
+        retail_unit:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - name
+      - retail_unit
+      - stock
+    ProductDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+          nullable: true
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        stock:
+          type: integer
+        status:
+          type: string
+          nullable: true
+          maxLength: 50
+        retail_unit:
+          type: string
+          readOnly: true
+          nullable: true
+        mall:
+          type: string
+          readOnly: true
+          nullable: true
+        tenant:
+          type: string
+          readOnly: true
+        retail_unit_id:
+          type: integer
+          writeOnly: true
+      required:
+      - id
+      - mall
+      - name
+      - price
+      - retail_unit
+      - retail_unit_id
+      - stock
+      - tenant
+    ProductList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+          nullable: true
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        stock:
+          type: integer
+          readOnly: true
+        status:
+          type: string
+          nullable: true
+          maxLength: 50
+        retail_unit:
+          type: string
+          readOnly: true
+          nullable: true
+        mall:
+          type: string
+          readOnly: true
+          nullable: true
+        tenant:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - mall
+      - name
+      - price
+      - retail_unit
+      - stock
+      - tenant
+    ProductWrite:
+      type: object
+      description: Used by PUT/PATCH /api/tenant/products/<id>/ .
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        retail_unit:
+          type: integer
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+          nullable: true
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        stock_quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        status:
+          type: string
+          nullable: true
+          maxLength: 50
+      required:
+      - id
+      - name
+      - price
+      - retail_unit
+    PurchaseDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        customer:
+          type: string
+          readOnly: true
+        tenant:
+          type: string
+          readOnly: true
+        retail_unit:
+          type: string
+          readOnly: true
+          nullable: true
+        total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        full_paid:
+          type: boolean
+        date:
+          type: string
+          format: date-time
+          readOnly: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PurchaseItem'
+          readOnly: true
+      required:
+      - customer
+      - date
+      - id
+      - items
+      - retail_unit
+      - tenant
+      - total
+    PurchaseItem:
+      type: object
+      properties:
+        product:
+          type: string
+          readOnly: true
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        unit_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        total_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+      required:
+      - product
+      - quantity
+      - total_price
+      - unit_price
+    PurchaseList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        customer:
+          type: string
+          readOnly: true
+        tenant:
+          type: string
+          readOnly: true
+        retail_unit:
+          type: string
+          readOnly: true
+          nullable: true
+        total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        full_paid:
+          type: boolean
+        date:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - customer
+      - date
+      - id
+      - retail_unit
+      - tenant
+      - total
+    RecentPurchase:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        customer:
+          type: string
+          readOnly: true
+        retail_unit:
+          type: string
+          readOnly: true
+          nullable: true
+        total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        date:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - customer
+      - date
+      - id
+      - retail_unit
+      - total
+    RoleEnum:
+      enum:
+      - admin
+      - tenant
+      - mall_manager
+      type: string
+      description: |-
+        * `admin` - Admin
+        * `tenant` - Tenant
+        * `mall_manager` - Mall Manager
+    Tenant:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        fullname:
+          type: string
+          maxLength: 250
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          readOnly: true
+      required:
+      - email
+      - fullname
+      - id
+      - role
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        fullname:
+          type: string
+          maxLength: 250
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+      required:
+      - email
+      - fullname
+      - id
+    UserCreate:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        fullname:
+          type: string
+          maxLength: 250
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+      required:
+      - email
+      - fullname
+      - password
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"

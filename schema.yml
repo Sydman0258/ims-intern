@@ -1,0 +1,381 @@
+openapi: 3.0.3
+info:
+  title: Your Project API
+  version: 1.0.0
+  description: Your project description
+paths:
+  /api/customer/:
+    get:
+      operationId: customer_list
+      tags:
+      - customer
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+          description: ''
+  /api/customer/purchases/:
+    get:
+      operationId: customer_purchases_list
+      tags:
+      - customer
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PurchaseList'
+          description: ''
+  /api/customer/purchases/{id}/:
+    get:
+      operationId: customer_purchases_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - customer
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseDetail'
+          description: ''
+  /api/mall/:
+    get:
+      operationId: mall_list
+      tags:
+      - mall
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MallList'
+          description: ''
+  /api/mall/{mall_id}/:
+    get:
+      operationId: mall_retrieve
+      parameters:
+      - in: path
+        name: mall_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - mall
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/product/:
+    get:
+      operationId: product_list
+      tags:
+      - product
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductList'
+          description: ''
+  /api/product/{id}/:
+    get:
+      operationId: product_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - product
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDetail'
+          description: ''
+  /api/tenant/dashboard/:
+    get:
+      operationId: tenant_dashboard_retrieve
+      tags:
+      - tenant
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+components:
+  schemas:
+    Customer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        phone:
+          type: string
+          maxLength: 20
+        email:
+          type: string
+          nullable: true
+          maxLength: 255
+      required:
+      - id
+      - name
+      - phone
+    MallList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        floors:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        total_shops:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        num_leased:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        tenant_count:
+          type: integer
+          readOnly: true
+        unit_count:
+          type: integer
+          readOnly: true
+      required:
+      - floors
+      - id
+      - name
+      - tenant_count
+      - total_shops
+      - unit_count
+    ProductDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+          nullable: true
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        stock:
+          type: integer
+        status:
+          type: string
+          nullable: true
+          maxLength: 50
+        retail_unit:
+          type: string
+          readOnly: true
+          nullable: true
+        mall:
+          type: string
+          readOnly: true
+          nullable: true
+        tenant:
+          type: string
+          readOnly: true
+        retail_unit_id:
+          type: integer
+          writeOnly: true
+      required:
+      - id
+      - mall
+      - name
+      - price
+      - retail_unit
+      - retail_unit_id
+      - stock
+      - tenant
+    ProductList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+          nullable: true
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        stock:
+          type: integer
+          readOnly: true
+        status:
+          type: string
+          nullable: true
+          maxLength: 50
+        retail_unit:
+          type: string
+          readOnly: true
+          nullable: true
+        mall:
+          type: string
+          readOnly: true
+          nullable: true
+        tenant:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - mall
+      - name
+      - price
+      - retail_unit
+      - stock
+      - tenant
+    PurchaseDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        customer:
+          type: string
+          readOnly: true
+        tenant:
+          type: string
+          readOnly: true
+        retail_unit:
+          type: string
+          readOnly: true
+          nullable: true
+        total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        full_paid:
+          type: boolean
+        date:
+          type: string
+          format: date-time
+          readOnly: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PurchaseItem'
+          readOnly: true
+      required:
+      - customer
+      - date
+      - id
+      - items
+      - retail_unit
+      - tenant
+      - total
+    PurchaseItem:
+      type: object
+      properties:
+        product:
+          type: string
+          readOnly: true
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        unit_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        total_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+      required:
+      - product
+      - quantity
+      - total_price
+      - unit_price
+    PurchaseList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        customer:
+          type: string
+          readOnly: true
+        tenant:
+          type: string
+          readOnly: true
+        retail_unit:
+          type: string
+          readOnly: true
+          nullable: true
+        total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        full_paid:
+          type: boolean
+        date:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - customer
+      - date
+      - id
+      - retail_unit
+      - tenant
+      - total
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
