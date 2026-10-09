@@ -1,27 +1,28 @@
 from django.urls import path
+from rest_framework.routers import SimpleRouter
 
+from accounts.jwt_views import (
+    CookieTokenObtainPairView,
+    CookieTokenRefreshView,
+    CookieTokenLogoutView,
+    MeView as JwtMeView,
+)
 from .views import (
-    LoginView,
-    LogoutView,
-    MeView,
-    UserList,
-    UserDetail,
-    UserCreate,
+    UserViewSet,
     AdminList,
     TenantList,
     MallManagerList,
 )
 
+router = SimpleRouter()
+router.register(r"users", UserViewSet, basename="user")
+
 urlpatterns = [
-    path("login/", LoginView.as_view(), name="api-login"),
-    path("logout/", LogoutView.as_view(), name="api-logout"),
-    path("me/", MeView.as_view(), name="api-me"),
-
-    path("users/", UserList.as_view(), name="user-list"),
-    path("users/create/", UserCreate.as_view(), name="user-create"),
-    path("users/<int:user_id>/", UserDetail.as_view(), name="user-detail"),
-
+    path("login/", CookieTokenObtainPairView.as_view(), name="api-login"),
+    path("logout/", CookieTokenLogoutView.as_view(), name="api-logout"),
+    path("refresh/", CookieTokenRefreshView.as_view(), name="api-refresh"),
+    path("me/", JwtMeView.as_view(), name="api-me"),
     path("admins/", AdminList.as_view(), name="admin-list"),
     path("tenants/", TenantList.as_view(), name="tenant-list"),
     path("mall-managers/", MallManagerList.as_view(), name="mall-manager-list"),
-]
+] + router.urls

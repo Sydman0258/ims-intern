@@ -1,25 +1,87 @@
 from django.db.models import Count, Q, Sum
 from customer.models import CustomerPayment, CustomerPurchase
+from mall.api.pagination import MallPaginationView
 from product.models import Product
-from rest_framework import generics
+from rest_framework import viewsets,generics,status,serializers
 from rest_framework.response import Response
 
-
-
-from accounts.api.permissions import IsMallStaff
+from accounts.api.permissions import IsMallStaff,IsAdminRole
 from mall.models import Mall
 from mall.api.serializers import (
     MallBriefSerializer,
+    MallCreateSerializer,
     MallListSerializer,
+    MallReadSerializer,
+    MallUpdateSerializer,
     RetailUnitInMallSerializer,
     TenantInMallSerializer,
 )
-from tenant.models import LeasePayment, RetailUnit
+from tenant.api.serializers import (
+    TenantBriefSerializer
+)
+from tenant.models import LeasePayment, RetailUnit,Tenant
 
 
-class MallList(generics.ListAPIView):
+class MallCreateAndTenant(generics.CreateAPIView): # type: ignore
+    permission_classes=[IsAdminRole]
+    serializer_class=MallCreateSerializer
+
+
+class MallListWithTenant(generics.ListAPIView):
+    permission_classes=[IsAdminRole]
+    serializer_class=MallReadSerializer   
+    pagination_class=MallPaginationView
+
+    queryset = Mall.objects.select_related(
+    "user"
+).prefetch_related(
+    "retail_unit__tenant"
+)        
+
+class UpdateMallWithTenant(generics.UpdateAPIView):
+    permission_classes=[IsAdminRole]
+    serializer_class=MallUpdateSerializer
+    queryset = Mall.objects.all()
+
+
+
+class MallDelete(generics.DestroyAPIView):
+    permission_classes = [IsAdminRole]
+
+    queryset = Mall.objects.select_related(
+        "user"
+    ).prefetch_related(
+        "retail_unit__tenant"
+    )
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+
+        return Response(
+            {
+                "detail": "MALL DELETED MOFO."
+            },
+            status=status.HTTP_200_OK
+        )
+
+class TenantProfileListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tenant
+        fields = ["id", "name", "email", "phone"]
+
+class ExistingTenantList(generics.ListAPIView):
+    permission_classes = [IsAdminRole]
+    queryset = Tenant.objects.order_by("name")
+    serializer_class = TenantProfileListSerializer
+    pagination_class=MallPaginationView
+            
+class MallViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsMallStaff]
     serializer_class = MallListSerializer
+    lookup_url_kwarg = "mall_id"
+    pagination_class=MallPaginationView
+
 
     def get_queryset(self):
         return (
@@ -30,19 +92,6 @@ class MallList(generics.ListAPIView):
             )
             .order_by("name")
         )
-
-    # def list(self, request, *args, **kwargs):
-    #     queryset = self.filter_queryset(self.get_queryset())
-    #     serializer = self.get_serializer(queryset, many=True)
-    #     return Response({"malls": serializer.data})
-
-
-class MallDetail(generics.RetrieveAPIView):
-    permission_classes = [IsMallStaff]
-    serializer_class=MallListSerializer
-    queryset = Mall.objects.all()
-
-    lookup_url_kwarg = "mall_id"
 
     def retrieve(self, request, *args, **kwargs):
         mall = self.get_object()
@@ -88,3 +137,6 @@ class MallDetail(generics.RetrieveAPIView):
             "lease_total": lease_total,
             "product_count": Product.objects.filter(retail_unit__mall=mall).count(),
         })
+
+
+    

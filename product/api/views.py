@@ -8,19 +8,19 @@ from .serializers import ProductDetailSerializer, ProductListSerializer
 
 
 
-class ProductViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    A Simple Viewsets for Product List and Details
-    """
+# class ProductViewSet(viewsets.ReadOnlyModelViewSet):
+#     """
+#     A Simple Viewsets for Product List and Details
+#     """
 
 
-    queryset=(Product.objects.all().select_related("retail_unit","retail_unit__mall","retail_unit__tenant").order_by("name")
-        )
+#     queryset=(Product.objects.all().select_related("retail_unit","retail_unit__mall","retail_unit__tenant").order_by("name")
+#         )
 
-    def get_serializer_class(self):
-       if self.action=="retrieve":
-           return ProductDetailSerializer
-       return ProductListSerializer
+#     def get_serializer_class(self):
+#        if self.action=="retrieve":
+#            return ProductDetailSerializer
+#        return ProductListSerializer
            
 
 # class ProductList(viewsets.ViewSet):

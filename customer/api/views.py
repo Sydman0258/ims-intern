@@ -1,16 +1,18 @@
-from rest_framework import generics, viewsets
+from rest_framework import viewsets
 
-from accounts.api.permissions import IsMallStaff
+from accounts.api.permissions import IsMallStaff, IsTenantWithProfile
 from customer.models import Customer, CustomerPurchase
+from rest_framework import generics
 
 from .serializers import (
     CustomerSerializer,
     PurchaseDetailSerializer,
     PurchaseListSerializer,
+    RecordPurchaseWriteSerializer,
 )
 
 
-class CustomerList(generics.ListAPIView):
+class CustomerViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsMallStaff]
     serializer_class = CustomerSerializer
     queryset = Customer.objects.order_by("name")
@@ -36,3 +38,8 @@ class PurchaseViewSet(viewsets.ReadOnlyModelViewSet):
         if tenant_id:
             qs = qs.filter(tenant_id=tenant_id)
         return qs
+
+class RecordSale(generics.CreateAPIView):
+    permission_classes = [IsTenantWithProfile]
+    serializer_class = RecordPurchaseWriteSerializer
+

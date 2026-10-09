@@ -1,11 +1,15 @@
+from rest_framework.routers import SimpleRouter
+from customer.api.views import RecordSale
 from django.urls import path
-from rest_framework.routers import DefaultRouter
 
-from .views import CustomerList, PurchaseViewSet
+from .views import CustomerViewSet, PurchaseViewSet
 
-router = DefaultRouter()
+router = SimpleRouter()
+router.register(r"", CustomerViewSet, basename="customer")
 router.register(r"purchases", PurchaseViewSet, basename="purchase")
 
-urlpatterns = [
-    path("", CustomerList.as_view(), name="customer_list"),
-] + router.urls
+urlpatterns=[
+    path("sales/", RecordSale.as_view(), name="record-sale"),
+
+]
+urlpatterns += router.urls

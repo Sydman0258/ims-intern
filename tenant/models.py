@@ -14,7 +14,7 @@ class Tenant(models.Model):
         blank=True,
     )
     name = models.CharField(max_length=100)
-    email = models.CharField(max_length=255, null=True, blank=True)
+    email = models.CharField(max_length=255, null=True, blank=True,unique=True)
     phone = models.CharField(max_length=20, null=True, blank=True)
     malls = models.ManyToManyField(Mall, blank=True, related_name="tenants")
     created_at = models.DateTimeField(auto_now_add=True)
