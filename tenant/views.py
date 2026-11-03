@@ -10,6 +10,8 @@ from customer.models import CustomerPayment, CustomerPurchase
 from customer.services import InsufficientStock, create_offline_purchase
 from product.models import Product
 from django.urls import reverse_lazy
+from django.contrib.auth import logout
+
 
 from .forms import OfflineSaleForm, ProductForm
 from .models import RetailUnit
@@ -21,6 +23,8 @@ class DashboardView(TenantRequiredMixin, TemplateView):
     def dispatch(self, request, *args, **kwargs):
         self.tenant = self.get_tenant()
         if self.tenant is None:
+            logout(request)
+            messages.error(request, "Your account has no tenant profile. Contact the administrator.")
             return redirect("accounts:login")
         return super().dispatch(request, *args, **kwargs)
 

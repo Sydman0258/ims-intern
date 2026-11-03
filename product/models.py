@@ -1,10 +1,20 @@
 from django.db import models
-
 from tenant.models import RetailUnit
 
 
+class Category(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Tags(models.Model):
+    name=models.CharField(max_length=100,blank=True)
+
+    def __str__(self):
+        return self.name
 class Product(models.Model):
-    """Products belong to a retail store (unit), not the tenant company."""
 
     retail_unit = models.ForeignKey(
         RetailUnit,
@@ -13,6 +23,23 @@ class Product(models.Model):
         null=True,
         blank=True,
     )
+
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.PROTECT,
+        related_name="products",
+        null=True,
+        blank=True,
+    )
+
+    tags=models.ManyToManyField(
+        Tags,
+        related_name="products",
+        null=True,
+        blank=True,
+
+    )
+
     name = models.CharField(max_length=150)
     description = models.TextField(null=True, blank=True)
     image = models.ImageField(upload_to="products/", null=True, blank=True)
@@ -24,12 +51,3 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
-
-    @property
-    def tenant(self):
-        return self.retail_unit.tenant
-
-    @property
-    def shop(self):
-        """Backward-compatible alias used in older code."""
-        return self.retail_unit.tenant

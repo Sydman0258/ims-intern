@@ -1045,6 +1045,9 @@ components:
           type: string
           format: decimal
           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        category:
+          type: integer
+          nullable: true
         stock_quantity:
           type: integer
           maximum: 2147483647
@@ -1078,6 +1081,9 @@ components:
           type: string
           format: uri
           nullable: true
+        category:
+          type: string
+          readOnly: true
         stock:
           type: integer
           readOnly: true
@@ -1089,6 +1095,7 @@ components:
           format: decimal
           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
       required:
+      - category
       - id
       - name
       - price
@@ -1116,6 +1123,9 @@ components:
           type: string
           format: decimal
           pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        category:
+          type: integer
+          nullable: true
         stock_quantity:
           type: integer
           maximum: 2147483647

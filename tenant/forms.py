@@ -60,7 +60,7 @@ class ProductForm(forms.ModelForm):
 
     class Meta:
         model = Product
-        fields = ["retail_unit", "name", "description", "price", "stock_quantity", "status"]
+        fields = ["retail_unit", "name", "description","category", "price","image", "stock_quantity","status"]
         widgets = {
             "retail_unit": forms.Select(attrs={"class": "form-select"}),
             "name": forms.TextInput(attrs={"class": "form-control", "placeholder": "Product name"}),

@@ -247,3 +247,154 @@ class MeAPITest(APITestCase):
             ]
         )
 
+
+# ---------------------------------------------------------------------------
+# User model / role / proxy tests
+# ---------------------------------------------------------------------------
+
+from django.test import TestCase
+
+from accounts.models import (
+    Admin,
+    MallManager,
+    Role,
+    tenant as TenantProxy,
+)
+
+
+class UserModelTests(TestCase):
+    def test_create_user_requires_email(self):
+        with self.assertRaises(ValueError):
+            User.objects.create_user(email="", password="x")
+
+    def test_create_user_defaults_to_tenant_role(self):
+        user = User.objects.create_user(
+            email="default@test.com",
+            password="Pass123!",
+            fullname="Default User",
+        )
+        self.assertEqual(user.role, Role.TENANT)
+        self.assertEqual(user.USERNAME_FIELD, "email")
+        self.assertEqual(str(user), "default@test.com")
+
+    def test_create_superuser_forces_admin_flags(self):
+        admin = User.objects.create_superuser(
+            email="super@test.com",
+            password="SuperPass123!",
+            fullname="Super",
+        )
+        self.assertTrue(admin.is_staff)
+        self.assertTrue(admin.is_superuser)
+        self.assertEqual(admin.role, Role.ADMIN)
+
+    def test_admin_proxy_sets_role(self):
+        a = Admin.objects.create_user(
+            email="proxyadmin@test.com",
+            password="Pass123!",
+            fullname="Proxy Admin",
+        )
+        self.assertEqual(a.role, Role.ADMIN)
+        self.assertTrue(Admin.objects.filter(email="proxyadmin@test.com").exists())
+
+    def test_tenant_proxy_sets_role(self):
+        t = TenantProxy.objects.create_user(
+            email="proxytenant@test.com",
+            password="Pass123!",
+            fullname="Proxy Tenant",
+        )
+        self.assertEqual(t.role, Role.TENANT)
+
+    def test_mall_manager_proxy_sets_role(self):
+        m = MallManager.objects.create_user(
+            email="proxymgr@test.com",
+            password="Pass123!",
+            fullname="Proxy Manager",
+        )
+        self.assertEqual(m.role, Role.MALL_MANAGER)
+
+    def test_proxy_managers_filter_by_role(self):
+        User.objects.create_user(
+            email="a@t.com", password="p", fullname="A", role=Role.ADMIN
+        )
+        User.objects.create_user(
+            email="t@t.com", password="p", fullname="T", role=Role.TENANT
+        )
+        User.objects.create_user(
+            email="m@t.com", password="p", fullname="M", role=Role.MALL_MANAGER
+        )
+        self.assertEqual(Admin.objects.count(), 1)
+        self.assertEqual(TenantProxy.objects.count(), 1)
+        self.assertEqual(MallManager.objects.count(), 1)
+
+
+class AccountsRoleListAPITests(APITestCase):
+    """Admin-only role listing endpoints under /api/accounts/."""
+
+    def setUp(self):
+        self.admin = User.objects.create_user(
+            email="roleadmin@test.com",
+            password="AdminPass123!",
+            fullname="Role Admin",
+            role=Role.ADMIN,
+            is_staff=True,
+            is_superuser=True,
+        )
+        self.tenant = User.objects.create_user(
+            email="rolettenant@test.com",
+            password="TenantPass123!",
+            fullname="Role Tenant",
+            role=Role.TENANT,
+        )
+        self.manager = User.objects.create_user(
+            email="rolemanager@test.com",
+            password="MgrPass123!",
+            fullname="Role Manager",
+            role=Role.MALL_MANAGER,
+        )
+
+    def test_admins_list_requires_auth(self):
+        response = self.client.get("/api/accounts/admins/")
+        self.assertIn(
+            response.status_code,
+            [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN],
+        )
+
+    def test_admin_can_list_admins(self):
+        self.client.force_authenticate(user=self.admin)
+        response = self.client.get("/api/accounts/admins/")
+        self.assertIn(
+            response.status_code,
+            [status.HTTP_200_OK, status.HTTP_403_FORBIDDEN],
+        )
+
+    def test_tenant_cannot_list_admins(self):
+        self.client.force_authenticate(user=self.tenant)
+        response = self.client.get("/api/accounts/admins/")
+        self.assertIn(
+            response.status_code,
+            [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN],
+        )
+
+    def test_tenants_list_as_admin(self):
+        self.client.force_authenticate(user=self.admin)
+        response = self.client.get("/api/accounts/tenants/")
+        self.assertIn(
+            response.status_code,
+            [status.HTTP_200_OK, status.HTTP_403_FORBIDDEN],
+        )
+
+    def test_mall_managers_list_as_admin(self):
+        self.client.force_authenticate(user=self.admin)
+        response = self.client.get("/api/accounts/mall-managers/")
+        self.assertIn(
+            response.status_code,
+            [status.HTTP_200_OK, status.HTTP_403_FORBIDDEN],
+        )
+
+    def test_users_viewset_requires_auth(self):
+        response = self.client.get("/api/accounts/users/")
+        self.assertIn(
+            response.status_code,
+            [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN],
+        )
+

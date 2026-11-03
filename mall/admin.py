@@ -3,13 +3,14 @@ from django.contrib import admin, messages
 from django.core.mail import send_mail
 from django.utils.crypto import get_random_string
 from django.utils.html import format_html
+from import_export.admin import ImportExportModelAdmin
 
 from accounts.models import Role, User
 from .models import Mall
 
 
 @admin.register(Mall)
-class MallAdmin(admin.ModelAdmin):
+class MallAdmin(ImportExportModelAdmin):
     list_display = ("name", "email", "floors", "total_shops", "num_leased", "user_link", "created_at")
     list_filter = ("name", "floors")
     search_fields = ("name", "email", "phone", "user__email", "user__fullname")

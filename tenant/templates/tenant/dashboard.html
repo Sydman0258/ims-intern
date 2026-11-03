@@ -107,7 +107,8 @@
                     <th>Price</th>
                     <th>Stock</th>
                     <th>Status</th>
-                    <th></th>
+                    <th>Category</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -118,6 +119,8 @@
                         <td>{{ product.price }}</td>
                         <td>{{ product.stock_quantity }}</td>
                         <td>{{ product.status|default:"-" }}</td>
+                        <td>{{product.category}}</td>
+
                         <td>
                             <div class="d-flex gap-2">
                                 <a href="{% url 'tenant:edit_products' product.pk %}"

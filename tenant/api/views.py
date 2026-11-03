@@ -310,11 +310,12 @@ class ProductFilter(filters.FilterSet):
     min_stock=filters.NumberFilter(field_name="stock_quantity", lookup_expr='gte')
     max_Stock=filters.NumberFilter(field_name="stock_quantity",lookup_expr="lte")
     retail_unit=filters.NumberFilter(field_name="retail_unit_id",lookup_expr="exact")
+    category=filters.CharFilter(field_name="category__name",lookup_expr='exact')
 
 
     class Meta:
         model=Product
-        fields=["name","stock_quantity","price"]
+        fields=["name","stock_quantity","price","category"]
 
 
 class ProductViewModelSet(viewsets.ModelViewSet):
@@ -324,11 +325,10 @@ class ProductViewModelSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         tenant = self.request.user.tenant_profile
-
         queryset = (
             Product.objects
             .filter(retail_unit__tenant=tenant)
-            .select_related("retail_unit")
+            .select_related("retail_unit","category")
             .order_by("name")
         )
 

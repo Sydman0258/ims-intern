@@ -69,6 +69,11 @@
                         <label class="form-label fw-semibold">Status</label>
                         {{ form.status }}
                     </div>
+                                        <div class="mb-4">
+                        <label class="form-label fw-semibold">Category</label>
+                        {{ form.category }}
+                    </div>
+                          
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">Add Product</button>
                         <a href="{% url 'tenant:dashboard' %}" class="btn btn-outline-secondary">Cancel</a>

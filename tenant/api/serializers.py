@@ -111,9 +111,12 @@ class ProductSerializer(serializers.ModelSerializer):
     retail_unit = serializers.CharField(source="retail_unit.title", read_only=True)
     stock = serializers.IntegerField(source="stock_quantity", read_only=True)
 
+    category = serializers.CharField(source="category.name", read_only=True)
+    tags=serializers.CharField(source="tags.name",read_only=True)
+
     class Meta:
         model = Product
-        fields = ["id", "name","image", "stock", "retail_unit","price"]
+        fields = ["id", "name","image", "category","stock", "retail_unit","tags","price"]
 
 
 def ensure_retail_unit_belongs_to_tenant(serializer, tenant):
@@ -141,6 +144,8 @@ class ProductWriteSerializer(serializers.ModelSerializer):
             "image",
             "description",
             "price",
+            "category",
+            "tags",
             "stock_quantity",
             "status",
         ]
