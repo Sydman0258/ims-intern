@@ -1,17 +1,27 @@
-from django.db.models import ProtectedError, Sum
+from django.db import transaction
+from django.http import FileResponse, HttpResponse
 
 from customer.api.serializers import RecentPurchaseSerializer
 from rest_framework import generics, serializers, status, viewsets
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from django_filters import rest_framework as filters
+from rest_framework.decorators import action
+from tablib import Dataset
+from rest_framework.parsers import MultiPartParser,FormParser
+from django.shortcuts import get_object_or_404
+
 
 from accounts.api.permissions import IsTenantWithProfile
 from customer.models import CustomerPayment, CustomerPurchase
 from customer.services import InsufficientStock, create_offline_purchase
-from product.models import Product
+from product.models import ExportJob, Product,ImportJob
+from product.tasks import export_products_task,import_products_task
+from tenant.api.pagination import ProductPaginationView
+from tenant.filters import ProductFilter
 from tenant.forms import OfflineSaleForm
 from tenant.models import RetailUnit
+from product.admin import ProductResource
 
 from .serializers import (
     MallBriefSerializer,
@@ -304,26 +314,17 @@ class PaymentHistoryPagination(PageNumberPagination):
 #      return Response(serializer.data)
 
 
-class ProductFilter(filters.FilterSet):
-    min_price=filters.NumberFilter(field_name="price",lookup_expr='gte')
-    max_price=filters.NumberFilter(field_name="price",lookup_expr='lte')
-    min_stock=filters.NumberFilter(field_name="stock_quantity", lookup_expr='gte')
-    max_Stock=filters.NumberFilter(field_name="stock_quantity",lookup_expr="lte")
-    retail_unit=filters.NumberFilter(field_name="retail_unit_id",lookup_expr="exact")
-    category=filters.CharFilter(field_name="category__name",lookup_expr='exact')
-
-
-    class Meta:
-        model=Product
-        fields=["name","stock_quantity","price","category"]
 
 
 class ProductViewModelSet(viewsets.ModelViewSet):
     permission_classes=[IsTenantWithProfile]
     filterset_class=ProductFilter
     filter_backends = (filters.DjangoFilterBackend,)
+    pagination_class=ProductPaginationView
 
     def get_queryset(self):
+        if getattr(self, "swagger_fake_view", False):
+            return Product.objects.none()
         tenant = self.request.user.tenant_profile
         queryset = (
             Product.objects
@@ -359,3 +360,149 @@ class ProductViewModelSet(viewsets.ModelViewSet):
         if self.action in ["create","update","partial_update"]:
             return ProductWriteSerializer
         return ProductSerializer
+
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="export",
+    )
+    def export_products(self, request):
+        tenant = request.user.tenant_profile
+
+        self.filter_queryset(self.get_queryset())
+
+        job = ExportJob.objects.create(
+            user=request.user,
+            tenant=tenant,
+            filters=request.query_params.dict(),
+        )
+
+        transaction.on_commit(
+            lambda: export_products_task.delay(job.id)
+        )
+
+        return Response(
+            {
+                "message": "Export request accepted.",
+                "job_id": job.id,
+                "status": job.status,
+            },
+            status=status.HTTP_202_ACCEPTED,
+        )
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path=r"exports/(?P<job_id>\d+)/status",
+    )
+    def export_status(self, request, job_id=None):
+        tenant = request.user.tenant_profile
+
+        job = get_object_or_404(
+            ExportJob,
+            id=job_id,
+            tenant=tenant,
+            user=request.user,
+        )
+
+        return Response({
+            "job_id": job.id,
+            "status": job.status,
+            "error": job.error_message,
+            "created_at": job.created_at,
+            "completed_at": job.completed_at,
+            "download_available": bool(job.file),
+        })
+
+
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path=r"exports/(?P<job_id>\d+)/download",
+    )
+    def download_export(self, request, job_id=None):
+        tenant = request.user.tenant_profile
+
+        job = get_object_or_404(
+            ExportJob,
+            id=job_id,
+            tenant=tenant,
+            user=request.user,
+        )
+
+        if job.status != "COMPLETED" or not job.file:
+            return Response(
+                {"detail": "Export is not ready yet."},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        return FileResponse(
+            job.file.open("rb"),
+            as_attachment=True,
+            filename=f"products_export_{job.id}.csv",
+        )
+
+    @action(
+        detail=False,
+        methods=["post"],
+        url_path="import",
+        parser_classes=[MultiPartParser, FormParser],
+    )
+    def import_products(self, request):
+        tenant = request.user.tenant_profile
+
+        uploaded_file = request.FILES.get("file")
+
+        if not uploaded_file:
+            return Response(
+                {"error": "Please upload a CSV file."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not uploaded_file.name.lower().endswith(".csv"):
+            return Response(
+                {"error": "Only CSV files are supported."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        job = ImportJob.objects.create(
+            user=request.user,
+            tenant=tenant,
+            file=uploaded_file,
+        )
+
+        transaction.on_commit(
+            lambda: import_products_task.delay(job.id)
+        )
+
+        return Response(
+            {
+                "message": "Import request accepted.",
+                "job_id": job.id,
+                "status": job.status,
+            },
+            status=status.HTTP_202_ACCEPTED,
+        )
+    
+    @action(
+        detail=False,
+        methods=["get"],
+        url_path=r"imports/(?P<job_id>\d+)/status",
+    )
+    def import_status(self, request, job_id=None):
+            tenant = request.user.tenant_profile
+
+            job = get_object_or_404(
+                ImportJob,
+                id=job_id,
+                tenant=tenant,
+                user=request.user,
+            )
+
+            return Response({
+                "job_id": job.id,
+                "status": job.status,
+                "error": job.error_message,
+                "created_at": job.created_at,
+                "completed_at": job.completed_at,
+            })
+    

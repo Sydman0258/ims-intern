@@ -646,6 +646,118 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/tenant/products/export/:
+    post:
+      operationId: tenant_products_export_create
+      tags:
+      - tenant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Product'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+  /api/tenant/products/exports/{job_id}/download/:
+    get:
+      operationId: tenant_products_exports_download_retrieve
+      parameters:
+      - in: path
+        name: job_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - tenant
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+  /api/tenant/products/exports/{job_id}/status/:
+    get:
+      operationId: tenant_products_exports_status_retrieve
+      parameters:
+      - in: path
+        name: job_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - tenant
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+  /api/tenant/products/import/:
+    post:
+      operationId: tenant_products_import_create
+      tags:
+      - tenant
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Product'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+  /api/tenant/products/imports/{job_id}/status/:
+    get:
+      operationId: tenant_products_imports_status_retrieve
+      parameters:
+      - in: path
+        name: job_id
+        schema:
+          type: string
+          pattern: ^\d+$
+        required: true
+      tags:
+      - tenant
+      security:
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
   /api/tenant/retail-units/add/:
     get:
       operationId: tenant_retail_units_add_retrieve
@@ -1048,6 +1160,11 @@ components:
         category:
           type: integer
           nullable: true
+        tags:
+          type: array
+          items:
+            type: integer
+            nullable: true
         stock_quantity:
           type: integer
           maximum: 2147483647
@@ -1090,6 +1207,9 @@ components:
         retail_unit:
           type: string
           readOnly: true
+        tags:
+          type: string
+          readOnly: true
         price:
           type: string
           format: decimal
@@ -1101,6 +1221,7 @@ components:
       - price
       - retail_unit
       - stock
+      - tags
     ProductWrite:
       type: object
       properties:
@@ -1126,6 +1247,11 @@ components:
         category:
           type: integer
           nullable: true
+        tags:
+          type: array
+          items:
+            type: integer
+            nullable: true
         stock_quantity:
           type: integer
           maximum: 2147483647

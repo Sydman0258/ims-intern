@@ -1,6 +1,8 @@
 from django.db import models
 from tenant.models import RetailUnit
 
+from django.conf import settings
+
 
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -51,3 +53,78 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class ExportJob(models.Model):
+    STATUS_CHOICES = [
+        ("PENDING", "Pending"),
+        ("PROCESSING", "Processing"),
+        ("COMPLETED", "Completed"),
+        ("FAILED", "Failed"),
+    ]
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="export_jobs",
+    )
+    tenant = models.ForeignKey(
+        "tenant.Tenant",
+        on_delete=models.CASCADE,
+        related_name="export_jobs",
+    )
+    file = models.FileField(
+        upload_to="exports/products/",
+        null=True,
+        blank=True,
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="PENDING",
+    )
+    error_message = models.TextField(blank=True)
+    filters = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Export #{self.pk} - {self.status}"
+
+class ImportJob(models.Model):
+    STATUS_CHOICES = [
+        ("PENDING", "Pending"),
+        ("PROCESSING", "Processing"),
+        ("COMPLETED", "Completed"),
+        ("FAILED", "Failed"),
+    ]
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
+
+    tenant = models.ForeignKey(
+        "tenant.Tenant",
+        on_delete=models.CASCADE,
+    )
+
+    file = models.FileField(upload_to="imports/")
+
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default="PENDING",
+    )
+
+    error_message = models.TextField(blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    completed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"Import {self.id} - {self.status}"
